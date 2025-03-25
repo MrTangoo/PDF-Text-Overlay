@@ -70,11 +70,13 @@
             // Récupérer la taille de l'iframe et de la zone de superposition
             const iframe = document.getElementById("iframe");
             const iframeRect = iframe.getBoundingClientRect(); // Position et dimensions de l'iframe
+            const overlay = document.getElementById("overlay");
+            const overlayRect = overlay.getBoundingClientRect(); // Position et dimensions de l'overlay
 
             element.addEventListener("mousedown", function(e) {
                 isDragging = true;
 
-                // Calculer les offsets en tenant compte de l'iframe
+                // Calculer les offsets en tenant compte de l'élément
                 offsetX = e.clientX - element.getBoundingClientRect().left;
                 offsetY = e.clientY - element.getBoundingClientRect().top;
 
@@ -85,16 +87,13 @@
             document.addEventListener("mousemove", function(e) {
                 if (!isDragging) return;
 
-                // Calculer les nouvelles positions tout en tenant compte du défilement de la page
-                let x = e.clientX - offsetX;
-                let y = e.clientY - offsetY;
+                // Calculer les nouvelles positions par rapport à l'overlay
+                let x = e.clientX - offsetX - overlayRect.left;
+                let y = e.clientY - offsetY - overlayRect.top;
 
-                // Récupérer la position de défilement de l'iframe (si l'iframe a un défilement interne)
-                const iframeScrollTop = iframe.contentWindow.scrollY || document.documentElement.scrollTop;
-
-                // Ajuster les positions x et y en fonction du défilement de l'iframe
-                x = Math.max(0, Math.min(x, iframeRect.width - element.offsetWidth));
-                y = Math.max(0, Math.min(y - iframeScrollTop, iframeRect.height - element.offsetHeight));
+                // Appliquer les bornes pour que l'élément ne dépasse pas les bords de l'overlay
+                x = Math.max(0, Math.min(x, overlayRect.width - element.offsetWidth));
+                y = Math.max(0, Math.min(y, overlayRect.height - element.offsetHeight));
 
                 // Déplacer l'élément
                 element.style.left = x + "px";
@@ -105,12 +104,13 @@
                 isDragging = false;
                 element.style.cursor = "grab";
 
-                // Sauvegarder les coordonnées dans le formulaire (en pourcentage par rapport à l'iframe)
-                document.getElementById("x").value = (parseInt(element.style.left) / iframeRect.width) * 100;
+                // Sauvegarder les coordonnées dans le formulaire (en pourcentage par rapport à l'overlay)
+                const overlayRect = document.getElementById("overlay").getBoundingClientRect();
+                document.getElementById("x").value = (parseInt(element.style.left) / overlayRect.width) * 100;
 
-                // Inverser la position Y pour le calcul en pourcentage
-                const adjustedY = iframeRect.height - parseInt(element.style.top);
-                document.getElementById("y").value = (adjustedY / iframeRect.height) * 100;
+                // Inverser la position Y pour ajuster la coordonnée (inversion de l'axe Y)
+                const adjustedY = overlayRect.height - parseInt(element.style.top);
+                document.getElementById("y").value = (adjustedY / overlayRect.height) * 100;
 
                 // Activer le bouton de soumission
                 document.getElementById("submitButton").disabled = false;
