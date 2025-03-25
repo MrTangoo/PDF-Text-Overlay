@@ -87,9 +87,13 @@
             document.addEventListener("mousemove", function(e) {
                 if (!isDragging) return;
 
-                // Calculer les nouvelles positions par rapport à l'overlay
-                let x = e.clientX - offsetX - overlayRect.left;
-                let y = e.clientY - offsetY - overlayRect.top;
+                // Récupérer le défilement de la page et de l'iframe
+                const scrollX = window.scrollX || window.pageXOffset;
+                const scrollY = window.scrollY || window.pageYOffset;
+
+                // Calculer les nouvelles positions par rapport à l'overlay, en tenant compte du défilement
+                let x = e.clientX - offsetX - overlayRect.left + scrollX;
+                let y = e.clientY - offsetY - overlayRect.top + scrollY;
 
                 // Appliquer les bornes pour que l'élément ne dépasse pas les bords de l'overlay
                 x = Math.max(0, Math.min(x, overlayRect.width - element.offsetWidth));
