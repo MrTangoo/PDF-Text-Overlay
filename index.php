@@ -20,12 +20,15 @@
         .draggable {
             position: absolute;
             cursor: grab;
-            background: yellow;
+            background: transparent;
             padding: 5px;
-            border: 1px solid black;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            font-size: 24px;
+            color: black;
+            white-space: nowrap;
         }
 
-        /* Styles pour l'iframe */
         #pdf-container {
             position: relative;
             width: 824px;
@@ -50,11 +53,11 @@
         <div id="overlay"></div>
     </div>
     <script>
-        document.getElementById("addText").addEventListener("click", function() {
-            var textValue = document.getElementById("texte").value;
+        document.getElementById("addText").addEventListener("click", () => {
+            const textValue = document.getElementById("texte").value;
             if (!textValue) return;
 
-            var textElement = document.createElement("div");
+            const textElement = document.createElement("div");
             textElement.classList.add("draggable");
             textElement.textContent = textValue;
             textElement.style.left = "50px";
@@ -66,57 +69,40 @@
 
         function makeDraggable(element) {
             let offsetX, offsetY, isDragging = false;
-
-            // Récupérer la taille de l'iframe et de la zone de superposition
-            const iframe = document.getElementById("iframe");
-            const iframeRect = iframe.getBoundingClientRect(); // Position et dimensions de l'iframe
             const overlay = document.getElementById("overlay");
-            const overlayRect = overlay.getBoundingClientRect(); // Position et dimensions de l'overlay
+            const overlayRect = overlay.getBoundingClientRect();
 
-            element.addEventListener("mousedown", function(e) {
+            element.addEventListener("mousedown", (e) => {
                 isDragging = true;
-
-                // Calculer les offsets en tenant compte de l'élément
                 offsetX = e.clientX - element.getBoundingClientRect().left;
                 offsetY = e.clientY - element.getBoundingClientRect().top;
-
-                // Changer le curseur pour "grabbing"
                 element.style.cursor = "grabbing";
             });
 
-            document.addEventListener("mousemove", function(e) {
+            document.addEventListener("mousemove", (e) => {
                 if (!isDragging) return;
 
-                // Récupérer le défilement de la page et de l'iframe
                 const scrollX = window.scrollX || window.pageXOffset;
                 const scrollY = window.scrollY || window.pageYOffset;
 
-                // Calculer les nouvelles positions par rapport à l'overlay, en tenant compte du défilement
                 let x = e.clientX - offsetX - overlayRect.left + scrollX;
                 let y = e.clientY - offsetY - overlayRect.top + scrollY;
 
-                // Appliquer les bornes pour que l'élément ne dépasse pas les bords de l'overlay
                 x = Math.max(0, Math.min(x, overlayRect.width - element.offsetWidth));
                 y = Math.max(0, Math.min(y, overlayRect.height - element.offsetHeight));
 
-                // Déplacer l'élément
-                element.style.left = x + "px";
-                element.style.top = y + "px";
+                element.style.left = `${x}px`;
+                element.style.top = `${y}px`;
             });
 
-            document.addEventListener("mouseup", function() {
+            document.addEventListener("mouseup", () => {
                 isDragging = false;
                 element.style.cursor = "grab";
 
-                // Sauvegarder les coordonnées dans le formulaire (en pourcentage par rapport à l'overlay)
-                const overlayRect = document.getElementById("overlay").getBoundingClientRect();
-                document.getElementById("x").value = (parseInt(element.style.left) / overlayRect.width) * 100;
-
-                // Inverser la position Y pour ajuster la coordonnée (inversion de l'axe Y)
                 const adjustedY = overlayRect.height - parseInt(element.style.top);
+                document.getElementById("x").value = (parseInt(element.style.left) / overlayRect.width) * 100;
                 document.getElementById("y").value = (adjustedY / overlayRect.height) * 100;
 
-                // Activer le bouton de soumission
                 document.getElementById("submitButton").disabled = false;
             });
         }
