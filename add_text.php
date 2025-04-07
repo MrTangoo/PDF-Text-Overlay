@@ -15,7 +15,7 @@ $y = isset($_POST['y']) ? (float) $_POST['y'] : 0; // Get the Y position as a pe
 
 // File paths
 $pdf_tmp = __DIR__ . '/uploads/v.pdf';
-$output_path = __DIR__ . '/output/output.pdf';
+$output_path = __DIR__ . '/uploads/v.pdf';
 
 if (!file_exists($pdf_tmp)) {
     die('Le fichier PDF n\'existe pas.');
@@ -50,6 +50,6 @@ for ($i = 1; $i <= $page_count; $i++) {
 $pdf->Output($output_path, 'F');
 
 // Provide download link and preview
-echo "<h2>Aperçu du PDF</h2><a href='output/output.pdf' download>Télécharger</a><br><br>";
-echo "<iframe src='output/output.pdf' style='width: 824px; height: 1190px;'></iframe>";
-echo "<br><br><a href='index.php'>Retour</a>";
+echo "<h2>Aperçu du PDF</h2><a href='/uploads/v.pdf' download>Télécharger</a><br><br>";
+echo "<iframe src='/uploads/v.pdf' style='width: 824px; height: 1190px;'></iframe>";
+echo "<br><br><a href='index.html'>Retour</a>";
